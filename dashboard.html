@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashtrail Compliance - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f3f4f6;
+            --dark: #1f2937;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid var(--border);
+            padding: 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover {
+            background: var(--light);
+        }
+
+        .nav-item.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-subtitle {
+            color: #6b7280;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .positive {
+            color: var(--success);
+        }
+
+        .negative {
+            color: var(--danger);
+        }
+
+        /* Actions Bar */
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            min-width: 300px;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            margin-left: 0.5rem;
+            width: 100%;
+        }
+
+        .button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary);
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--dark);
+        }
+
+        .btn-outline:hover {
+            background: var(--light);
+        }
+
+        /* Supplier Table */
+        .table-container {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--light);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        /* Status Badges */
+        .status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status.compliant {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status.pending {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .status.missing {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Risk Indicators */
+        .risk {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .risk-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .risk.low .risk-dot {
+            background: var(--success);
+        }
+
+        .risk.medium .risk-dot {
+            background: var(--warning);
+        }
+
+        .risk.high .risk-dot {
+            background: var(--danger);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: var(--light);
+            transform: translateY(-1px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-size: 1rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .search-bar {
+                min-width: 200px;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">Ashtrail Compliance</div>
+        <div class="user-info">
+            <span>Demo Account</span>
+            <div class="user-avatar">DA</div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="nav-item active" onclick="showSection('dashboard')">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" onclick="showSection('suppliers')">
+                <span class="nav-icon">🏭</span>
+                <span>Suppliers</span>
+            </div>
+            <div class="nav-item" onclick="showSection('documents')">
+                <span class="nav-icon">📄</span>
+                <span>Documents</span>
+            </div>
+            <div class="nav-item" onclick="showSection('compliance')">
+                <span class="nav-icon">✅</span>
+                <span>Compliance</span>
+            </div>
+            <div class="nav-item" onclick="showSection('reports')">
+                <span class="nav-icon">📈</span>
+                <span>Reports</span>
+            </div>
+            <div class="nav-item" onclick="showSection('alerts')">
+                <span class="nav-icon">🔔</span>
+                <span>Alerts</span>
+            </div>
+            <div class="nav-item" onclick="showSection('settings')">
+                <span class="nav-icon">⚙️</span>
+                <span>Settings</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Compliance Dashboard</h1>
+                <p class="dashboard-subtitle">Monitor your supply chain compliance in real-time</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Suppliers</div>
+                    <div class="stat-value">247</div>
+                    <div class="stat-change positive">
+                        <span>↑</span>
+                        <span>12 new this month</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Compliance Rate</div>
+                    <div class="stat-value" style="color: var(--success);">94%</div>
+                    <div class="stat-change positive">
+                        <span>↑</span>
+                        <span>3% from last month</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pending Documents</div>
+                    <div class="stat-value" style="color: var(--warning);">23</div>
+                    <div class="stat-change negative">
+                        <span>↓</span>
+                        <span>5 overdue</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">High Risk Suppliers</div>
+                    <div class="stat-value" style="color: var(--danger);">8</div>
+                    <div class="stat-change">
+                        <span>→</span>
+                        <span>Requires action</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Bar -->
+            <div class="actions-bar">
+                <div style="display: flex; gap: 0.75rem;">
+                    <div class="search-bar">
+                        <span>🔍</span>
+                        <input type="text" placeholder="Search suppliers..." id="searchInput" onkeyup="filterSuppliers()">
+                    </div>
+                    <select class="form-select" style="width: auto; padding: 0.5rem;" onchange="filterByStatus(this.value)">
+                        <option value="all">All Status</option>
+                        <option value="compliant">Compliant</option>
+                        <option value="pending">Pending</option>
+                        <option value="missing">Missing Info</option>
+                    </select>
+                    <select class="form-select" style="width: auto; padding: 0.5rem;" onchange="filterByRisk(this.value)">
+                        <option value="all">All Risk Levels</option>
+                        <option value="low">Low Risk</option>
+                        <option value="medium">Medium Risk</option>
+                        <option value="high">High Risk</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <button class="button btn-outline" onclick="exportData()">📥 Export</button>
+                    <button class="button btn-primary" onclick="openModal()">+ Add Supplier</button>
+                </div>
+            </div>
+
+            <!-- Suppliers Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Supplier Overview</h3>
+                    <span style="color: #6b7280;">Showing <span id="resultCount">10</span> of 247 suppliers</span>
+                </div>
+                <table id="suppliersTable">
+                    <thead>
+                        <tr>
+                            <th>Supplier Name</th>
+                            <th>Country</th>
+                            <th>Status</th>
+                            <th>Risk Level</th>
+                            <th>Documents</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td><strong>Apex Manufacturing Ltd.</strong></td>
+                            <td>🇺🇸 United States</td>
+                            <td><span class="status compliant">Compliant</span></td>
+                            <td><div class="risk low"><span class="risk-dot"></span>Low</div></td>
+                            <td>12/12 ✅</td>
+                            <td>2 days ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" onclick="viewDetails('Apex Manufacturing')">👁️</button>
+                                    <button class="btn-icon" onclick="sendReminder('Apex Manufacturing')">📧</button>
+                                    <button class="btn-icon" onclick="downloadReport('Apex Manufacturing')">📥</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Global Components Inc.</strong></td>
+                            <td>🇨🇳 China</td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><div class="risk medium"><span class="risk-dot"></span>Medium</div></td>
+                            <td>8/12 ⚠️</td>
+                            <td>1 week ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" onclick="viewDetails('Global Components')">👁️</button>
+                                    <button class="btn-icon" onclick="sendReminder('Global Components')">📧</button>
+                                    <button class="btn-icon" onclick="downloadReport('Global Components')">📥</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>EuroTech Solutions</strong></td>
+                            <td>🇩🇪 Germany</td>
+                            <td><span class="status compliant">Compliant</span></td>
+                            <td><div class="risk low"><span class="risk-dot"></span>Low</div></td>
+                            <td>15/15 ✅</td>
+                            <td>3 days ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" onclick="viewDetails('EuroTech')">👁️</button>
+                                    <button class="btn-icon" onclick="sendReminder('EuroTech')">📧</button>
+                                    <button class="btn-icon" onclick="downloadReport('EuroTech')">📥</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pacific Metals Co.</strong></td>
+                            <td>🇮🇳 India</td>
+                            <td><span class="status missing">Missing Info</span></td>
+                            <td><div class="risk high"><span class="risk-dot"></span>High</div></td>
+                            <td>3/12 ❌</td>
+                            <td>2 weeks ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" onclick="viewDetails('Pacific Metals')">👁️</button>
+                                    <button class="btn-icon" onclick="sendReminder('Pacific Metals')">📧</button>
+                                    <button class="btn-icon" onclick="downloadReport('Pacific Metals')">📥</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nordic Industries AB</strong></td>
+                            <td>🇸🇪 Sweden</td>
+                            <td><span class="status compliant">Compliant</span></td>
+                            <td><div class="risk low"><span class="risk-dot"></span>Low</div></td>
+                            <td>10/10 ✅</td>
+                            <td>1 day ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" onclick="viewDetails('Nordic Industries')">👁️</button>
+                                    <button class="btn-icon" onclick="sendReminder('Nordic Industries')">📧</button>
+                                    <button class="btn-icon" onclick="downloadReport('Nordic Industries')">📥</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Precision Parts LLC</strong></td>
+                            <td>🇲🇽 Mexico</td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><div class="risk medium"><span class="risk-dot"></span>Medium</div></td>
+                            <td>7/10 ⚠️</td>
+                            <td>5 days ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" onclick="viewDetails('Precision Parts')">👁️</button>
+                                    <button class="btn-icon" onclick="sendReminder('Precision Parts')">📧</button>
+                                    <button class="btn-icon" onclick="downloadReport('Precision Parts')">📥</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>AsiaWide Textiles</strong></td>
+                            <td>🇧🇩 Bangladesh</td>
+                            <td><span class="status missing">Missing Info</span></td>
+                            <td><div class="risk high"><span class="risk-dot"></span>High</div></td>
+                            <td>2/8 ❌</td>
+                            <td>3 weeks ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" onclick="viewDetails('AsiaWide Textiles')">👁️</button>
+                                    <button class="btn-icon" onclick="sendReminder('AsiaWide Textiles')">📧</button>
+                                    <button class="btn-icon" onclick="downloadReport('AsiaWide Textiles')">📥</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Canadian Steel Works</strong></td>
+                            <td>🇨🇦 Canada</td>
+                            <td><span class="status compliant">Compliant</span></td>
+                            <td><div class="risk low"><span class="risk-dot"></span>Low</div></td>
+                            <td>14/14 ✅</td>
+                            <td>4 days ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" onclick="viewDetails('Canadian Steel')">👁️</button>
+                                    <button class="btn-icon" onclick="sendReminder('Canadian Steel')">📧</button>
+                                    <button class="btn-icon" onclick="downloadReport('Canadian Steel')">📥</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Italian Leather Co.</strong></td>
+                            <td>🇮🇹 Italy</td>
+                            <td><span class="status compliant">Compliant</span></td>
+                            <td><div class="risk low"><span class="risk-dot"></span>Low</div></td>
+                            <td>9/9 ✅</td>
+                            <td>1 week ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" onclick="viewDetails('Italian Leather')">👁️</button>
+                                    <button class="btn-icon" onclick="sendReminder('Italian Leather')">📧</button>
+                                    <button class="btn-icon" onclick="downloadReport('Italian Leather')">📥</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tech Components Asia</strong></td>
+                            <td>🇻🇳 Vietnam</td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><div class="risk medium"><span class="risk-dot"></span>Medium</div></td>
+                            <td>6/11 ⚠️</td>
+                            <td>10 days ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" onclick="viewDetails('Tech Components')">👁️</button>
+                                    <button class="btn-icon" onclick="sendReminder('Tech Components')">📧</button>
+                                    <button class="btn-icon" onclick="downloadReport('Tech Components')">📥</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Supplier Modal -->
+    <div class="modal" id="addSupplierModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Supplier</h2>
+                <p style="color: #6b7280;">Enter supplier information to begin compliance tracking</p>
+            </div>
+            
+            <form id="supplierForm">
+                <div class="form-group">
+                    <label class="form-label">Supplier Name *</label>
+                    <input type="text" class="form-input" placeholder="Enter supplier name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Country *</label>
+                    <select class="form-select" required>
+                        <option value="">Select country</option>
+                        <option value="us">United States</option>
+                        <option value="cn">China</option>
+                        <option value="de">Germany</option>
+                        <option value="in">India</option>
+                        <option value="mx">Mexico</option>
+                        <option value="ca">Canada</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Contact Email *</label>
+                    <input type="email" class="form-input" placeholder="supplier@company.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Product Category</label>
+                    <select class="form-select">
+                        <option value="">Select category</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="chemicals">Chemicals</option>
+                        <option value="textiles">Textiles</option>
+                        <option value="metals">Metals</option>
+                        <option value="plastics">Plastics</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Initial Risk Assessment</label>
+                    <select class="form-select">
+                        <option value="low">Low Risk</option>
+                        <option value="medium">Medium Risk</option>
+                        <option value="high">High Risk</option>
+                    </select>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="button btn-outline" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="button btn-primary">Add Supplier</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Modal Functions
+        function openModal() {
+            document.getElementById('addSupplierModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('addSupplierModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('addSupplierModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Form submission
+        document.getElementById('supplierForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('✅ Supplier added successfully!\nThe supplier will receive an onboarding email with document requirements.');
+            closeModal();
+        });
+
+        // Action functions
+        function viewDetails(supplier) {
+            alert(`📋 Opening details for: ${supplier}\n\nThis would show:\n• Complete compliance history\n• All uploaded documents\n• Risk assessment details\n• Communication logs`);
+        }
+
+        function sendReminder(supplier) {
+            alert(`📧 Reminder sent to: ${supplier}\n\nEmail sent requesting:\n• Missing documents\n• Updated certifications\n• Compliance declarations`);
+        }
+
+        function downloadReport(supplier) {
+            alert(`📥 Downloading report for: ${supplier}\n\nReport includes:\n• Compliance status\n• Risk assessment\n• Document checklist\n• Audit trail`);
+        }
+
+        function exportData() {
+            alert('📊 Exporting compliance data...\n\nGenerating:\n• Full supplier list (Excel)\n• Compliance summary (PDF)\n• Risk assessment report\n• Document status tracker');
+        }
+
+        // Filter functions
+        function filterSuppliers() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('suppliersTable');
+            const tr = table.getElementsByTagName('tr');
+            let visibleCount = 0;
+
+            for (let i = 1; i < tr.length; i++) {
+                const td = tr[i].getElementsByTagName('td')[0];
+                if (td) {
+                    const txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = '';
+                        visibleCount++;
+                    } else {
+                        tr[i].style.display = 'none';
+                    }
+                }
+            }
+            document.getElementById('resultCount').textContent = visibleCount;
+        }
+
+        function filterByStatus(status) {
+            const table = document.getElementById('suppliersTable');
+            const tr = table.getElementsByTagName('tr');
+            let visibleCount = 0;
+
+            for (let i = 1; i < tr.length; i++) {
+                const statusCell = tr[i].getElementsByTagName('td')[2];
+                if (statusCell) {
+                    const statusText = statusCell.textContent.toLowerCase();
+                    if (status === 'all' || statusText.includes(status)) {
+                        tr[i].style.display = '';
+                        visibleCount++;
+                    } else {
+                        tr[i].style.display = 'none';
+                    }
+                }
+            }
+            document.getElementById('resultCount').textContent = visibleCount;
+        }
+
+        function filterByRisk(risk) {
+            const table = document.getElementById('suppliersTable');
+            const tr = table.getElementsByTagName('tr');
+            let visibleCount = 0;
+
+            for (let i = 1; i < tr.length; i++) {
+                const riskCell = tr[i].getElementsByTagName('td')[3];
+                if (riskCell) {
+                    const riskText = riskCell.textContent.toLowerCase();
+                    if (risk === 'all' || riskText.includes(risk)) {
+                        tr[i].style.display = '';
+                        visibleCount++;
+                    } else {
+                        tr[i].style.display = 'none';
+                    }
+                }
+            }
+            document.getElementById('resultCount').textContent = visibleCount;
+        }
+
+        // Navigation
+        function showSection(section) {
+            // Update active nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Show section content
+            const sections = {
+                'dashboard': 'You are viewing the Dashboard',
+                'suppliers': 'Supplier Management - Add, edit, and track all suppliers',
+                'documents': 'Document Library - All compliance certificates and declarations',
+                'compliance': 'Compliance Programs - REACH, RoHS, Conflict Minerals tracking',
+                'reports': 'Reports & Analytics - Generate compliance reports and insights',
+                'alerts': 'Alerts & Notifications - 23 pending actions',
+                'settings': 'Settings - Configure compliance requirements and thresholds'
+            };
+            
+            if (section !== 'dashboard') {
+                alert(`🔄 Loading: ${sections[section]}\n\nThis section would contain detailed ${section} management features.`);
+            }
+        }
+
+        // Simulate real-time updates
+        setInterval(function() {
+            const now = new Date();
+            document.querySelector('.dashboard-subtitle').textContent = 
+                `Monitor your supply chain compliance in real-time • Last updated: ${now.toLocaleTimeString()}`;
+        }, 30000);
+    </script>
+</body>
+</html>
